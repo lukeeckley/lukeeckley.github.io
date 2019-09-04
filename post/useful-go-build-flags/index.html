@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en-us">
+	<head>
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="author" content="Luke Eckley">
+
+<meta name="generator" content="Hugo 0.58.0" />
+<title>Useful Go Build Flags</title>
+<link rel="shortcut icon" href="https://lukeeckley.com/images/favicon.ico">
+<link rel="stylesheet" href="https://lukeeckley.com/css/style.css">
+<link rel="stylesheet" href="https://lukeeckley.com/css/highlight.css">
+
+
+
+<link rel="stylesheet" href="https://lukeeckley.com/css/monosocialiconsfont.css">
+
+
+
+
+<meta property="og:title" content="Useful Go Build Flags" />
+<meta property="og:description" content="A handy guide to a few of Go&#39;s build command line options." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://lukeeckley.com/post/useful-go-build-flags/" />
+<meta property="article:published_time" content="2018-05-15T15:53:10+00:00" />
+<meta property="article:modified_time" content="2018-05-15T15:53:10+00:00" />
+
+
+<meta itemprop="name" content="Useful Go Build Flags">
+<meta itemprop="description" content="A handy guide to a few of Go&#39;s build command line options.">
+
+
+<meta itemprop="datePublished" content="2018-05-15T15:53:10&#43;00:00" />
+<meta itemprop="dateModified" content="2018-05-15T15:53:10&#43;00:00" />
+<meta itemprop="wordCount" content="547">
+
+
+
+<meta itemprop="keywords" content="" />
+
+<meta name="twitter:title" content="Useful Go Build Flags"/>
+<meta name="twitter:description" content="A handy guide to a few of Go&#39;s build command line options."/><meta name="twitter:card" content="summary"/>
+<meta name="twitter:image" content="https://lukeeckley.com/images/avatar@2x.jpg"/><meta name="twitter:site" content="@https://www.twitter.com/lukeeckley"/>
+<meta name="twitter:creator" content="@https://www.twitter.com/lukeeckley"/>
+
+
+
+    </head>
+<body>
+    <nav class="main-nav">
+	
+		<a href='https://lukeeckley.com/'> <span class="arrow">←</span>Home</a>
+	
+
+	
+
+	
+</nav>
+
+    <section id="wrapper">
+        
+        
+<article class="post">
+    <header>
+        <h1>Useful Go Build Flags</h1>
+        <h2 class="subtitle">A handy guide to a few of Go&rsquo;s build command line options.</h2>
+        <h2 class="headline">
+        May 15, 2018
+        <br>
+        
+        </h2>
+    </header>
+    <section id="post-body">
+        
+
+<h2 id="go-link-documentation">Go Link Documentation</h2>
+
+<p>It&rsquo;s all <a href="https://golang.org/cmd/link">here</a>. But what&rsquo;s the fun in just posting this link here.</p>
+
+<h2 id="setting-a-go-variable-at-build">Setting a Go Variable at Build</h2>
+
+<p>A very handy build flag that allows you to set a variable from the command line at build time. Looks at the following example:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+
+<span style="color:#f92672">import</span> (
+    <span style="color:#e6db74">&#34;fmt&#34;</span>
+)
+
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">who</span> <span style="color:#66d9ef">string</span>
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Hello, %s\n&#34;</span>, <span style="color:#a6e22e">who</span>)
+}</code></pre></div>
+
+<p>Using the defaults we get the following results:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#f92672">[</span>me@localhost ~<span style="color:#f92672">]</span>$ go run main.go
+Hello,</code></pre></div>
+
+<p>By adding the <code>-X</code> linker flag we can change <code>who</code> at compile time. This is just a silly example but this could be useful for updating version information in the binary at compile time.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#f92672">[</span>me@localhost ~<span style="color:#f92672">]</span>$ go run -ldflags <span style="color:#e6db74">&#34;-X main.who=Universe&#34;</span> main.go
+Hello, Universe</code></pre></div>
+
+<h2 id="bonus-content">Bonus Content</h2>
+
+<p>The symbol table can be viewed using the <code>go tool nm</code> command. Just pass it the name of the executable, object file or archive. Make it easy on yourself and just grep the output looking for your variable.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#f92672">[</span>me@localhost ~<span style="color:#f92672">]</span>$ go tool nm main | grep who
+  5390f0 D main.who</code></pre></div>
+
+<h2 id="shrinking-your-go-binaries">Shrinking Your Go Binaries</h2>
+
+<p>In this day and age I don&rsquo;t really think it&rsquo;s neccessary to make our static go executables many order of magnatude smaller - but on some occasions it would be nice. For an example I wrote a program to save the Windows 10 Spotlight photos to a folder on the desktop. The size after a <code>go build</code> is <code>5,728,768 Bytes</code>. I know, that&rsquo;s not very large. But let&rsquo;s improve on it. The first thing is to strip the binary.</p>
+
+<p>Build it without the flags for our reference point:</p>
+
+<pre><code>C:\Users\Luke\go\src\spotlight&gt; go build
+
+C:\Users\Luke\go\src\spotlight&gt; dir
+02/16/2018  01:52 PM         5,728,768 spotlight.exe
+</code></pre>
+
+<p>We can omit the symbol table, debug information and the DWARF table with the following flags: <code>-s -w</code></p>
+
+<p>Building it with the flags like so:</p>
+
+<pre><code>C:\Users\Luke\go\src\spotlight&gt;go build -ldflags &quot;-s -w&quot; -o spotlight-s-w.exe
+
+C:\Users\Luke\go\src\spotlight&gt;dir
+02/16/2018  03:29 PM         3,943,424 spotlight-s-w.exe
+02/16/2018  01:52 PM         5,728,768 spotlight.exe
+</code></pre>
+
+<p>We already decreased the size by over 30%. Why stop there? One of the best executable packers available is <a href="https://upx.github.io/">UPX</a>. It is dead simple to use. I ran it with -9 to get the maximum compression at a cost of speed.</p>
+
+<pre><code>C:\Users\Luke\go\src\spotlight&gt;upx -9 -o spotlight-s-w-upx.exe spotlight-s-w.exe
+                       Ultimate Packer for eXecutables
+                          Copyright (C) 1996 - 2017
+UPX 3.94w       Markus Oberhumer, Laszlo Molnar &amp; John Reiser   May 12th 2017
+
+        File size         Ratio      Format      Name
+   --------------------   ------   -----------   -----------
+   3943424 -&gt;   1275904   32.36%    win64/pe     spotlight-s-w-upx.exe
+
+Packed 1 file.
+
+C:\Users\Luke\go\src\spotlight&gt;dir
+02/16/2018  03:29 PM         1,275,904 spotlight-s-w-upx.exe
+02/16/2018  03:29 PM         3,943,424 spotlight-s-w.exe
+02/16/2018  01:52 PM         5,728,768 spotlight.exe
+</code></pre>
+
+<p>Wow. UPX gave us a binary that&rsquo;s only 32.36% the size of the stripped executable from go. The end result is a binary that is only 22.27% of the original size. That is incredible.</p>
+
+<h2 id="windows-executable-without-console-window">Windows Executable Without Console Window</h2>
+
+<p>I find this unsightly to have a console window open when I run an exe and I don&rsquo;t need to see any output. I couldn&rsquo;t find this documented on any golang site. I can&rsquo;t remember where I found it, but it is good to know:</p>
+
+<p>Just add <code>&quot;-H=windowsgui&quot;</code> to your linker flags. Console window gone. You&rsquo;re Welcome.</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>So to sum up this article we could build our earlier <code>Hello, World</code> example with the following flags to incorporate everything we have learned:</p>
+
+<pre><code>C:\Users\Luke\go\src\hello&gt;go build -ldflags &quot;-X main.who=Universe -H=windowsgui -s -w&quot;
+</code></pre>
+
+    </section>
+</article>
+
+<footer id="post-meta" class="clearfix">
+    <a href="https://twitter.com/lukeeckley">
+    <img class="avatar" src="https://lukeeckley.com/images/avatar.jpg">
+    <div>
+        <span class="dark">Luke Eckley</span>
+        <span></span>
+    </div>
+    </a>
+    <section id="sharing">
+        <a class="twitter" href="https://twitter.com/intent/tweet?text=https%3a%2f%2flukeeckley.com%2fpost%2fuseful-go-build-flags%2f - Useful%20Go%20Build%20Flags by @lukeeckley"><span class="icon-twitter"> tweet</span></a>
+
+<a class="facebook" href="#" onclick="
+    window.open(
+      'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(location.href),
+      'facebook-share-dialog',
+      'width=626,height=436');
+    return false;"><span class="icon-facebook-rect"> Share</span>
+</a>
+
+    </section>
+</footer>
+
+<div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "lukeeckley-com-blog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+<ul id="post-list" class="archive readmore">
+    <h3>Read more</h3>
+
+    
+    
+    
+</ul>
+
+
+
+        <footer id="footer">
+    <p class="small">
+    
+        © Copyright 2019 Luke Eckley
+    
+    </p>
+</footer>
+
+    </section>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://lukeeckley.com/js/main.js"></script>
+<script src="https://lukeeckley.com/js/highlight.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+
+</body>
+</html>

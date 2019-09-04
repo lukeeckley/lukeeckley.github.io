@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Luke Eckley &gt; /dev/blog</title>
+    <link>https://lukeeckley.com/</link>
+    <description>Recent content on Luke Eckley &gt; /dev/blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 15 May 2018 15:53:10 +0000</lastBuildDate>
+    
+	<atom:link href="https://lukeeckley.com/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Useful Go Build Flags</title>
+      <link>https://lukeeckley.com/post/useful-go-build-flags/</link>
+      <pubDate>Tue, 15 May 2018 15:53:10 +0000</pubDate>
+      
+      <guid>https://lukeeckley.com/post/useful-go-build-flags/</guid>
+      <description>Go Link Documentation It&amp;rsquo;s all here. But what&amp;rsquo;s the fun in just posting this link here.
+Setting a Go Variable at Build A very handy build flag that allows you to set a variable from the command line at build time. Looks at the following example:
+package main import ( &amp;#34;fmt&amp;#34; ) var who string func main() { fmt.Printf(&amp;#34;Hello, %s\n&amp;#34;, who) } Using the defaults we get the following results:</description>
+    </item>
+    
+  </channel>
+</rss>
